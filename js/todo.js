@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const taskText = todoInput.value.trim();
         if (taskText) {
             console.log('Add task:', taskText);
-            // TODO: Call localStorage add function
+            addTodo(taskText);
             todoInput.value = '';
         }
     });
@@ -72,4 +72,69 @@ document.addEventListener('DOMContentLoaded', function() {
     // - clearCompletedTodos() - Clear all completed todos
     // - renderTodos(filter) - Render todos based on filter
     // - updateTodoCount() - Update remaining tasks count
+
+    // === LocalStorage helper ===
+    function loadTodos() {
+        return JSON.parse(localStorage.getItem('todos')) || [];
+    }
+    function saveTodos(todos) {
+        localStorage.setItem('todos', JSON.stringify(todos));
+    }
+
+    // === Add todo ===
+    function addTodo(text) {
+        const todos = loadTodos();
+        const newTodo = {
+            id: Date.now(),
+            text: text
+        };
+        todos.push(newTodo);
+        saveTodos(todos);
+        renderTodos();
+        updateTodoCount();
+    }
+
+    // === Delete todo ===
+    function deleteTodo(id) {
+        let todos = loadTodos();
+        todos = todos.filter(t => t.id !== id);
+        saveTodos(todos);
+        renderTodos();
+        updateTodoCount();
+    }
+
+    // === Render todos ===
+    function renderTodos() {
+        const todos = loadTodos();
+        todoList.innerHTML = '';
+
+        if (todos.length === 0) {
+            emptyState.classList.remove('hidden');
+            return;
+        } else {
+            emptyState.classList.add('hidden');
+        }
+
+        todos.forEach(todo => {
+            const li = document.createElement('li');
+            li.className = 'p-4 hover:bg-gray-50 transition-colors';
+            li.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-gray-800">${todo.text}</span>
+                    <button class="text-red-600 hover:text-red-800 font-medium text-sm px-3 py-1 rounded hover:bg-red-50 transition-colors">
+                        Delete
+                    </button>
+                </div>
+            `;
+            li.querySelector('button').addEventListener('click', () => deleteTodo(todo.id));
+            todoList.appendChild(li);
+        });
+    }
+
+    function updateTodoCount() {
+        const todos = loadTodos();
+        const remaining = todos.filter(todo => !todo.completed).length;
+        todoCount.textContent = `${remaining} task${remaining !== 1 ? 's' : ''} remaining`;
+    }
+    renderTodos();
 });
