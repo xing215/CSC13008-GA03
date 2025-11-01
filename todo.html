@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App - Todo List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 min-h-screen" data-page="todo">
+    <!-- Navigation placeholder -->
+    <div id="nav-placeholder"></div>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">My Todo List</h1>
+            <p class="mt-2 text-gray-600">Manage your tasks efficiently</p>
+        </div>
+
+        <!-- Add Todo Form -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">Add New Task</h2>
+            <div class="flex gap-3">
+                <input 
+                    type="text" 
+                    id="todoInput" 
+                    placeholder="Enter a new task..." 
+                    class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button 
+                    id="addTodoBtn" 
+                    class="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+                >
+                    Add Task
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="mb-6">
+            <div class="flex space-x-2 border-b border-gray-200">
+                <button 
+                    id="filterAll" 
+                    class="px-4 py-2 text-sm font-medium text-blue-600 border-b-2 border-blue-600 focus:outline-none"
+                >
+                    All
+                </button>
+                <button 
+                    id="filterActive" 
+                    class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 focus:outline-none"
+                >
+                    Active
+                </button>
+                <button 
+                    id="filterCompleted" 
+                    class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 focus:outline-none"
+                >
+                    Completed
+                </button>
+            </div>
+        </div>
+
+        <!-- Todo List Container -->
+        <div class="bg-white rounded-lg shadow-md">
+            <ul id="todoList" class="divide-y divide-gray-200">
+                <!-- Todo items will be dynamically inserted here -->
+                <!-- Example todo item structure (for reference): -->
+                <li class="p-4 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center gap-3">
+                        <input 
+                            id="exampleTodoCheckbox"
+                            type="checkbox" 
+                            title="Mark task as completed"
+                            aria-label="Mark example task as completed"
+                            class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                        />
+                        <label for="exampleTodoCheckbox" class="sr-only">Mark task as completed</label>
+                        <span class="flex-1 text-gray-800">Example task - this will be populated by JavaScript</span>
+                        <button class="text-red-600 hover:text-red-800 font-medium text-sm px-3 py-1 rounded hover:bg-red-50 transition-colors">
+                            Delete
+                        </button>
+                    </div>
+                </li>
+            </ul>
+            
+            <!-- Empty State -->
+            <div id="emptyState" class="hidden p-12 text-center">
+                <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <h3 class="mt-2 text-sm font-medium text-gray-900">No tasks</h3>
+                <p class="mt-1 text-sm text-gray-500">Get started by creating a new task.</p>
+            </div>
+        </div>
+
+        <!-- Todo Stats -->
+        <div class="mt-6 flex justify-between items-center text-sm text-gray-600">
+            <span id="todoCount">0 tasks remaining</span>
+            <button id="clearCompleted" class="text-red-600 hover:text-red-800 font-medium">
+                Clear completed
+            </button>
+        </div>
+    </main>
+
+    <!-- Scripts -->
+
+    <script src="js/components/nav.js"></script>
+    <script src="js/todo.js"></script>
+</body>
+</html>
