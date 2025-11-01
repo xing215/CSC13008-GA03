@@ -1,22 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Todo App - Configuration</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-50 min-h-screen" data-page="config">
-    <!-- Navigation placeholder -->
-    <div id="nav-placeholder"></div>
-    
-    <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- TODO: Configuration page content -->
-    </main>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Todo App - Configuration</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+    </head>
+    <body class="bg-gray-50 min-h-screen" data-page="config">
+        <!-- Navigation placeholder -->
+        <div id="nav-placeholder"></div>
 
-    <!-- Scripts -->
-    <script src="js/components/nav.js"></script>
-    <script src="js/app.js"></script>
-</body>
+        <!-- Main Content -->
+        <main
+            class="flex max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 items-center justify-center"
+        >
+            <!-- TODO: Configuration page content -->
+            <header class="">
+                <div class="title flex text-3xl font-bold justify-center">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="size-8 mt-1 mr-4"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z"
+                        />
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                        />
+                    </svg>
+
+                    <h1 class="mb-2">Configuration</h1>
+                </div>
+                <p class="italic">
+                    Manage your application data, including backup, import and
+                    reset.
+                </p>
+            </header>
+        </main>
+        <div class="import-btn"></div>
+        <!-- Configure options -->
+        <div
+            class="shadow-md max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 rounded-xl"
+        >
+            <ul class="list">
+                <!-- Import -->
+                <li
+                    class="item bg-slate-100 p-4 rounded-xl border flex justify-between mb-5"
+                >
+                    <div class="info">
+                        <h2 class="sub-title font-bold">Import Data</h2>
+                        <p class="desc text-sm italic">
+                            Restore data from a backup file. This will replace
+                            current data.
+                        </p>
+                    </div>
+                    <div id="import-btn"></div>
+                </li>
+
+                <!-- Export -->
+                <li
+                    class="item bg-slate-100 p-4 rounded-xl border flex justify-between mb-5"
+                >
+                    <div class="info">
+                        <h2 class="sub-title font-bold">Export Data</h2>
+                        <p class="desc text-sm italic">
+                            Save current data to a backup file. This can be used
+                            for restoration later.
+                        </p>
+                    </div>
+                    <div id="export-btn"></div>
+                </li>
+
+                <!-- Delete -->
+                <li
+                    class="item bg-red-100 p-4 rounded-xl border flex justify-between"
+                >
+                    <div class="info">
+                        <h2 class="sub-title font-bold">Delete Data</h2>
+                        <p class="desc text-sm italic">
+                            Permanently remove all current data. This action
+                            cannot be undo.
+                        </p>
+                    </div>
+                    <div id="del-btn"></div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Scripts -->
+        <script src="js/components/nav.js"></script>
+        <script src="js/app.js"></script>
+        <script src="js/components/menu.js"></script>
+    </body>
 </html>
