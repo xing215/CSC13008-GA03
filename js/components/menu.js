@@ -199,38 +199,58 @@ function exportData() {
 }
 
 function delData() {
-    // Load current todos from localStorage
     const todos = JSON.parse(localStorage.getItem("todos")) || [];
-    notificationOKBtn = document.getElementById("notification-OK-btn");
-    notificationCancelBtn = document.getElementById("notification-cancel-btn");
+    const okBtnOriginal = document.getElementById("notification-OK-btn");
+    const cancelBtn = document.getElementById("notification-cancel-btn");
 
     if (todos.length === 0) {
         showNotification("You don’t have any tasks to delete.");
         return;
     }
 
-    // Use noti po-up to confirm
-    if (notificationOKBtn && notificationCancelBtn) {
-        document
-            .getElementById("notification-cancel-btn")
-            .classList.remove("hidden");
+    if (okBtnOriginal && cancelBtn) {
+        cancelBtn.classList.remove("hidden");
         showNotification("Delete all tasks permanently?");
 
-        // Remaove all data
-        notificationOKBtn.addEventListener("click", () => {
+        // Clone nút OK
+        const okBtnClone = okBtnOriginal.cloneNode(true);
+        okBtnClone.id = "notification-OK-btn-clone";
+
+        okBtnOriginal.style.display = "none";
+        okBtnOriginal.parentNode.insertBefore(
+            okBtnClone,
+            okBtnOriginal.nextSibling
+        );
+
+        okBtnClone.addEventListener("click", () => {
             localStorage.removeItem("todos");
 
-            document
-                .getElementById("notification-cancel-btn")
-                .classList.add("hidden");
+            // Ẩn cancel
+            cancelBtn.classList.add("hidden");
 
             // Refresh UI
             if (typeof renderTodos === "function") renderTodos();
             if (typeof updateTodoCount === "function") updateTodoCount();
+
+            // Hiện noti success
+            showNotification(
+                "All tasks have been deleted successfully!",
+                "success"
+            );
+
+            okBtnClone.remove();
+            okBtnOriginal.style.display = "";
         });
 
-        // Cancel to remove data
-        notificationCancelBtn.addEventListener("click", hideNotification);
+        cancelBtn.addEventListener(
+            "click",
+            () => {
+                hideNotification();
+                okBtnClone.remove();
+                okBtnOriginal.style.display = "";
+            },
+            { once: true }
+        );
     }
 }
 
