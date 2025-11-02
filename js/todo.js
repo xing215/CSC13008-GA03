@@ -30,29 +30,31 @@ document.addEventListener("DOMContentLoaded", function () {
             addTodoBtn.click();
         }
     });
-
-    clearCompleted.addEventListener("click", function () {
-        console.log("Clear completed tasks");
-        // TODO: Call localStorage clear completed function
+    
+    clearCompleted.addEventListener('click', function() {
+        console.log('Clear completed tasks');
+        clearCompletedTodos();
     });
+    
+    let currentFilter = 'all';
 
     // Filter button event listeners
     filterAll.addEventListener("click", function () {
         setActiveFilter(this);
-        console.log("Filter: All");
-        // TODO: Call filter function
+        currentFilter = 'all';
+        renderTodos();
     });
 
     filterActive.addEventListener("click", function () {
         setActiveFilter(this);
-        console.log("Filter: Active");
-        // TODO: Call filter function
+        currentFilter = 'active';
+        renderTodos();
     });
 
     filterCompleted.addEventListener("click", function () {
         setActiveFilter(this);
-        console.log("Filter: Completed");
-        // TODO: Call filter function
+        currentFilter = 'completed';
+        renderTodos();
     });
 
     function setActiveFilter(activeBtn) {
@@ -95,11 +97,25 @@ document.addEventListener("DOMContentLoaded", function () {
         const newTodo = {
             id: Date.now(),
             text: text,
+            completed: false
         };
         todos.push(newTodo);
         saveTodos(todos);
         renderTodos();
         updateTodoCount();
+    }
+
+    // === Toggle todo ===
+    function toggleTodo(id) {
+        let todos = loadTodos();
+        const todoIndex = todos.findIndex(t => t.id === id);
+        
+        if (todoIndex > -1) {
+            todos[todoIndex].completed = !todos[todoIndex].completed;
+            saveTodos(todos);
+            renderTodos();
+            updateTodoCount();
+        }
     }
 
     // === Delete todo ===
@@ -111,21 +127,42 @@ document.addEventListener("DOMContentLoaded", function () {
         updateTodoCount();
     }
 
+    // === Clear Completed Todos ===
+    function clearCompletedTodos() {
+        let todos = loadTodos();
+        todos = todos.filter(t => !t.completed); 
+        saveTodos(todos);
+        renderTodos();
+        updateTodoCount();
+    }
+
     // === Render todos ===
     function renderTodos() {
-        const todos = loadTodos();
-        todoList.innerHTML = "";
+        const allTodos = loadTodos();
+        let todosToRender = [];
 
-        if (todos.length === 0) {
-            emptyState.classList.remove("hidden");
-            return;
+        if (currentFilter === 'active') {
+            todosToRender = allTodos.filter(todo => !todo.completed);
+        } else if (currentFilter === 'completed') {
+            todosToRender = allTodos.filter(todo => todo.completed);
+        } else { 
+            todosToRender = allTodos;
+        }
+
+        todoList.innerHTML = '';
+
+        if (allTodos.length === 0) {
+            emptyState.classList.remove('hidden');
         } else {
             emptyState.classList.add("hidden");
         }
 
-        todos.forEach((todo) => {
-            const li = document.createElement("li");
-            li.className = "p-4 hover:bg-gray-50 transition-colors";
+        todosToRender.forEach(todo => {
+            const li = document.createElement('li');
+            li.className = 'p-4 hover:bg-gray-50 transition-colors';
+
+            const textClass = todo.completed ? 'line-through text-gray-500' : 'text-gray-800';
+
             li.innerHTML = `
                 <div class="flex items-center gap-3">
                     <input 
@@ -134,17 +171,17 @@ document.addEventListener("DOMContentLoaded", function () {
                         title="Mark task as completed"
                         aria-label="Mark task as completed"
                         class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
-                    />
+                        ${todo.completed ? 'checked' : ''} />
                     <label for="todo-${todo.id}" class="sr-only">Mark task as completed</label>
-                    <span class="flex-1 text-gray-800">${todo.text}</span>
-                    <button class="text-red-600 hover:text-red-800 font-medium text-sm px-3 py-1 rounded hover:bg-red-50 transition-colors">
+                    <span class="flex-1 ${textClass}">${todo.text}</span> <button class="text-red-600 hover:text-red-800 font-medium text-sm px-3 py-1 rounded hover:bg-red-50 transition-colors">
                         Delete
                     </button>
                 </div>
             `;
-            li.querySelector("button").addEventListener("click", () =>
-                deleteTodo(todo.id)
-            );
+
+            li.querySelector('input[type="checkbox"]').addEventListener('change', () => toggleTodo(todo.id));
+            
+            li.querySelector('button').addEventListener('click', () => deleteTodo(todo.id));
             todoList.appendChild(li);
         });
     }
@@ -156,9 +193,12 @@ document.addEventListener("DOMContentLoaded", function () {
             remaining !== 1 ? "s" : ""
         } remaining`;
     }
+    // Initial render
+    setActiveFilter(filterAll); 
     renderTodos();
 
     //Expose function globally
     window.renderTodos = renderTodos;
     window.updateTodoCount = updateTodoCount;
+    updateTodoCount();
 });
