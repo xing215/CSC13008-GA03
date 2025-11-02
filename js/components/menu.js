@@ -1,9 +1,13 @@
-// Biến toàn cục để quản lý timer của thông báo
 let notificationTimer;
 let notificationPopup;
 let notificationBackdrop;
 let notificationMessage;
 let notificationCancelBtn;
+
+/**
+ * ------------ Button implement -------------
+ *
+ */
 
 function getImportBtn() {
     return `
@@ -77,7 +81,6 @@ function getDelBtn() {
     `;
 }
 
-// Load manu component
 function loadImportBtn() {
     const importBtn = document.getElementById("import-btn");
     if (importBtn) {
@@ -86,7 +89,7 @@ function loadImportBtn() {
             console.log("Import clicked.");
 
             // Import function
-            showNotification("Hello world...");
+            importData();
         });
     }
 }
@@ -99,6 +102,7 @@ function loadExportBtn() {
             console.log("Export clicked.");
 
             // EXport function
+            exportData();
         });
     }
 }
@@ -109,19 +113,129 @@ function loadDelBtn() {
         delBtn.innerHTML = getDelBtn();
         delBtn.addEventListener("click", () => {
             console.log("Delete clicked.");
-
             // Del function
+            delData();
         });
     }
 }
 
-/**
- *
- * Tạo hàm thực thi khi click ở từng nút
- */
+function importData() {
+    // Create a hidden file input dynamically
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "application/json";
+
+    // Trigger file picker
+    input.click();
+
+    input.onchange = (event) => {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+
+        reader.onload = (e) => {
+            try {
+                // Parse JSON file
+                const todos = JSON.parse(e.target.result);
+
+                if (!Array.isArray(todos)) {
+                    showNotification(
+                        "Invalid file format: expected an array.",
+                        "error"
+                    );
+                    return;
+                }
+
+                // Save to localStorage
+                localStorage.setItem("todos", JSON.stringify(todos));
+
+                // Refresh UI (if functions exist)
+                if (typeof renderTodos === "function") renderTodos();
+                if (typeof updateTodoCount === "function") updateTodoCount();
+
+                showNotification("Import successfully.");
+            } catch (error) {
+                showNotification(
+                    "Failed to import: invalid JSON file.",
+                    "error"
+                );
+                console.error(error);
+            }
+        };
+
+        reader.readAsText(file);
+    };
+}
+
+function exportData() {
+    // Load current todos from localStorage
+    const todos = JSON.parse(localStorage.getItem("todos")) || [];
+
+    if (todos.length === 0) {
+        showNotification("You don’t have any tasks to export.");
+        return;
+    }
+
+    // Create a JSON string
+    const jsonData = JSON.stringify(todos, null, 4);
+
+    const blob = new Blob([jsonData], { type: "application/json" });
+
+    // Create a temporary download link
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+
+    // Add timestamp
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    a.download = `todos-backup-${timestamp}.json`;
+
+    // Trigger download and cleanup
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+function delData() {
+    // Load current todos from localStorage
+    const todos = JSON.parse(localStorage.getItem("todos")) || [];
+    notificationOKBtn = document.getElementById("notification-OK-btn");
+    notificationCancelBtn = document.getElementById("notification-cancel-btn");
+
+    if (todos.length === 0) {
+        showNotification("You don’t have any tasks to delete.");
+        return;
+    }
+
+    // Use noti po-up to confirm
+    if (notificationOKBtn && notificationCancelBtn) {
+        document
+            .getElementById("notification-cancel-btn")
+            .classList.remove("hidden");
+        showNotification("Delete all tasks permanently?");
+
+        // Remaove all data
+        notificationOKBtn.addEventListener("click", () => {
+            localStorage.removeItem("todos");
+
+            document
+                .getElementById("notification-cancel-btn")
+                .classList.add("hidden");
+
+            // Refresh UI
+            if (typeof renderTodos === "function") renderTodos();
+            if (typeof updateTodoCount === "function") updateTodoCount();
+        });
+
+        // Cancel to remove data
+        notificationCancelBtn.addEventListener("click", hideNotification);
+    }
+}
 
 /**
- * ------------- Notification ------------------------
+ * ------------- Notification ----------------
  *
  */
 function getNoti() {
@@ -137,7 +251,24 @@ function getNoti() {
                     w-full max-w-sm z-50 
                     transition-all duration-300 opacity-0 scale-90 hidden">
             
-            <p id="notification-message" class="mb-4 border-b border-salte-200 border-opacity-30 pb-3">Message goes here.</p>
+            <div class="flex">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 mb-3">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 
+                    1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 
+                    3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 
+                    0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" />
+                </svg>
+                <p class ="ml-4 font-bold">Notification</p>
+            </div>
+            <p id="notification-message" 
+                class="flex items-start gap-3 p-3 mb-4 rounded-md border border-gray-100 bg-gray-50 shadow-inner">
+                
+
+                <span class="text-gray-800 text-sm leading-relaxed">
+                    Message goes here.
+                </span>
+            </p>
+
 
             <div class="flex justify-end">
                 <button id="notification-OK-btn" 
@@ -145,9 +276,10 @@ function getNoti() {
                     OK
                 </button>
                 <button id="notification-cancel-btn" 
-                        class="w-[68px] px-3 py-1 bg-white border bg-opacity-20 text-sm text-blue-600 rounded-md hover:bg-slate-100 ml-2">
+                        class="hidden w-[68px] px-3 py-1 bg-white border bg-opacity-20 text-sm text-blue-600 rounded-md hover:bg-slate-100 ml-2">
                     Cancel
                 </button>
+
             </div>
         </div>
     `;
@@ -165,20 +297,11 @@ function loadNotification() {
     notificationBackdrop = document.getElementById("notification-backdrop");
     notificationMessage = document.getElementById("notification-message");
     notificationOKBtn = document.getElementById("notification-OK-btn");
-    notificationCancelBtn = document.getElementById("notification-cancel-btn");
 
     // OK btn
     if (notificationBackdrop && notificationOKBtn) {
         notificationBackdrop.addEventListener("click", hideNotification);
-        // Thuc hien ham khi bam nut
-
         notificationOKBtn.addEventListener("click", hideNotification);
-    }
-
-    // Cancel btn
-    if (notificationBackdrop && notificationCancelBtn) {
-        notificationBackdrop.addEventListener("click", hideNotification);
-        notificationCancelBtn.addEventListener("click", hideNotification);
     }
 }
 
@@ -190,9 +313,14 @@ function showNotification(message, type = "success") {
 
     notificationMessage.textContent = message;
 
-    notificationPopup.classList.remove("bg-white", "bg-red-500");
+    notificationPopup.classList.remove("bg-white", "bg-red-200");
+    notificationMessage.classList.remove("border-black");
+    notificationOKBtn.classList.remove("bg-red-600");
+
     if (type === "error") {
-        notificationPopup.classList.add("bg-red-500");
+        notificationPopup.classList.add("bg-red-200");
+        notificationMessage.classList.add("border-black");
+        notificationOKBtn.classList.add("bg-red-600");
     } else {
         notificationPopup.classList.add("bg-white");
     }
@@ -216,15 +344,14 @@ function hideNotification() {
 }
 
 /**
+ * ----------------- MENU----------------------
  *
- * ------------ MENU-------------------------
  */
 function getMenu() {
     return `
         <div
-            // Menu position
             class="
-                fixed left-5 top-1/2 -translate-y-1/2 
+                fixed right-5 bottom-5 scale-[0.8]
                 z-30 flex flex-col items-center space-y-3
             "
         >
@@ -233,8 +360,7 @@ function getMenu() {
                 ${getExportBtn()} 
                 ${getDelBtn()}
             </div>
-            
-            </div>
+        </div>
     `;
 }
 
@@ -247,20 +373,26 @@ function loadMenu() {
 
     document.getElementById("import-btn").addEventListener("click", () => {
         console.log("Import clicked");
-        // Gọi hàm của bạn: showImportPopup();
-        showNotification("Hello world...");
+        // Call import function
+        importData();
     });
 
     document.getElementById("export-btn").addEventListener("click", () => {
         console.log("Export clicked");
-        // Gọi hàm của bạn: showExportPopup();
+        // Call export function
+        exportData();
     });
 
     document.getElementById("del-btn").addEventListener("click", () => {
         console.log("Delete clicked");
-        // Gọi hàm của bạn: showDeletePopup();
+        // Call del function
+        delData();
     });
 }
+
+/**
+ *  -------------- DOM loading ------------------
+ */
 
 const currentPagePath = window.location.pathname;
 
