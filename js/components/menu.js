@@ -1,5 +1,9 @@
 // Biến toàn cục để quản lý timer của thông báo
 let notificationTimer;
+let notificationPopup;
+let notificationBackdrop;
+let notificationMessage;
+let notificationCancelBtn;
 
 function getImportBtn() {
     return `
@@ -113,43 +117,102 @@ function loadDelBtn() {
 
 /**
  *
- * Tạo hàm thực thi khi click ở từng nút (Tiện cho tái sử dụng)
+ * Tạo hàm thực thi khi click ở từng nút
  */
 
-function showNotification(message, type = "success") {
-    const notification = document.getElementById("notification-popup");
+/**
+ * ------------- Notification ------------------------
+ *
+ */
+function getNoti() {
+    return `
+        <div id="notification-backdrop" 
+             class="fixed inset-0 bg-black bg-opacity-50 z-40 
+                    transition-opacity duration-300 opacity-0 hidden">
+        </div>
 
-    // Nếu không tìm thấy element, thoát
-    if (!notification) {
-        console.error("Notification element not found!");
+        <div id="notification-popup" 
+             class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+                    bg-white p-4 rounded-lg shadow-lg 
+                    w-full max-w-sm z-50 
+                    transition-all duration-300 opacity-0 scale-90 hidden">
+            
+            <p id="notification-message" class="mb-4 border-b border-salte-200 border-opacity-30 pb-3">Message goes here.</p>
+
+            <div class="flex justify-end">
+                <button id="notification-OK-btn" 
+                        class="w-[68px] px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-opacity-50">
+                    OK
+                </button>
+                <button id="notification-cancel-btn" 
+                        class="w-[68px] px-3 py-1 bg-white border bg-opacity-20 text-sm text-blue-600 rounded-md hover:bg-slate-100 ml-2">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function loadNotification() {
+    const notificationContainer = document.createElement("div");
+    notificationContainer.id = "notification-container-wrapper";
+
+    notificationContainer.innerHTML = getNoti();
+
+    document.body.appendChild(notificationContainer);
+
+    notificationPopup = document.getElementById("notification-popup");
+    notificationBackdrop = document.getElementById("notification-backdrop");
+    notificationMessage = document.getElementById("notification-message");
+    notificationOKBtn = document.getElementById("notification-OK-btn");
+    notificationCancelBtn = document.getElementById("notification-cancel-btn");
+
+    // OK btn
+    if (notificationBackdrop && notificationOKBtn) {
+        notificationBackdrop.addEventListener("click", hideNotification);
+        // Thuc hien ham khi bam nut
+
+        notificationOKBtn.addEventListener("click", hideNotification);
+    }
+
+    // Cancel btn
+    if (notificationBackdrop && notificationCancelBtn) {
+        notificationBackdrop.addEventListener("click", hideNotification);
+        notificationCancelBtn.addEventListener("click", hideNotification);
+    }
+}
+
+function showNotification(message, type = "success") {
+    if (!notificationPopup || !notificationMessage || !notificationBackdrop) {
+        console.error("Notification error!!!");
         return;
     }
 
-    // Xóa timer cũ (nếu có) để thông báo mới hiển thị đủ
-    if (notificationTimer) {
-        clearTimeout(notificationTimer);
-    }
+    notificationMessage.textContent = message;
 
-    // 1. Cập nhật nội dung
-    notification.textContent = message;
-
-    // 2. Đổi màu dựa trên type (dùng class Tailwind)
-    notification.classList.remove("bg-green-500", "bg-red-500"); // Xóa màu cũ
+    notificationPopup.classList.remove("bg-white", "bg-red-500");
     if (type === "error") {
-        notification.classList.add("bg-red-500");
+        notificationPopup.classList.add("bg-red-500");
     } else {
-        notification.classList.add("bg-green-500");
+        notificationPopup.classList.add("bg-white");
     }
 
-    // 3. Hiển thị thông báo (bằng cách đổi class Tailwind)
-    notification.classList.remove("opacity-0", "-translate-y-10");
-    notification.classList.add("opacity-100", "translate-y-0");
+    notificationPopup.classList.remove("hidden", "opacity-0", "scale-90");
+    notificationBackdrop.classList.remove("hidden", "opacity-0");
+}
 
-    // 4. Tự động ẩn sau 3 giây
-    notificationTimer = setTimeout(() => {
-        notification.classList.remove("opacity-100", "translate-y-0");
-        notification.classList.add("opacity-0", "-translate-y-10");
-    }, 3000); // 3000ms = 3 giây
+function hideNotification() {
+    if (!notificationPopup || !notificationBackdrop) {
+        return;
+    }
+
+    notificationPopup.classList.add("opacity-0", "scale-90");
+    notificationBackdrop.classList.add("opacity-0");
+
+    setTimeout(() => {
+        notificationPopup.classList.add("hidden");
+        notificationBackdrop.classList.add("hidden");
+    }, 300);
 }
 
 /**
@@ -159,6 +222,7 @@ function showNotification(message, type = "success") {
 function getMenu() {
     return `
         <div
+            // Menu position
             class="
                 fixed left-5 top-1/2 -translate-y-1/2 
                 z-30 flex flex-col items-center space-y-3
@@ -175,21 +239,16 @@ function getMenu() {
 }
 
 function loadMenu() {
-    // 1. Tạo một div container mới
     const menuContainer = document.createElement("div");
     menuContainer.id = "static-menu-container";
-    menuContainer.innerHTML = getMenu(); // Lấy HTML từ hàm getMenu đã sửa
+    menuContainer.innerHTML = getMenu();
 
-    // 2. Thêm container này vào body
     document.body.appendChild(menuContainer);
 
-    // 3. (Đã xóa code toggle)
-
-    // 4. Giữ lại các event listener cho các nút
     document.getElementById("import-btn").addEventListener("click", () => {
         console.log("Import clicked");
         // Gọi hàm của bạn: showImportPopup();
-        showNotification("Hello world..."); // Giữ lại code cũ của bạn
+        showNotification("Hello world...");
     });
 
     document.getElementById("export-btn").addEventListener("click", () => {
@@ -206,6 +265,7 @@ function loadMenu() {
 const currentPagePath = window.location.pathname;
 
 function initializeApp() {
+    loadNotification();
     loadImportBtn();
     loadExportBtn();
     loadDelBtn();
