@@ -119,8 +119,16 @@ document.addEventListener('DOMContentLoaded', function() {
             const li = document.createElement('li');
             li.className = 'p-4 hover:bg-gray-50 transition-colors';
             li.innerHTML = `
-                <div class="flex items-center justify-between">
-                    <span class="text-gray-800">${todo.text}</span>
+                <div class="flex items-center gap-3">
+                    <input 
+                        id="todo-${todo.id}"
+                        type="checkbox" 
+                        title="Mark task as completed"
+                        aria-label="Mark task as completed"
+                        class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500 cursor-pointer"
+                    />
+                    <label for="todo-${todo.id}" class="sr-only">Mark task as completed</label>
+                    <span class="flex-1 text-gray-800">${todo.text}</span>
                     <button class="text-red-600 hover:text-red-800 font-medium text-sm px-3 py-1 rounded hover:bg-red-50 transition-colors">
                         Delete
                     </button>
