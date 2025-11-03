@@ -1,32 +1,32 @@
 // Todo page JavaScript
 // LocalStorage operations (add/remove/mark as done) is not implemented
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
     // DOM elements
-    const todoInput = document.getElementById('todoInput');
-    const addTodoBtn = document.getElementById('addTodoBtn');
-    const todoList = document.getElementById('todoList');
-    const emptyState = document.getElementById('emptyState');
-    const todoCount = document.getElementById('todoCount');
-    const clearCompleted = document.getElementById('clearCompleted');
-    
+    const todoInput = document.getElementById("todoInput");
+    const addTodoBtn = document.getElementById("addTodoBtn");
+    const todoList = document.getElementById("todoList");
+    const emptyState = document.getElementById("emptyState");
+    const todoCount = document.getElementById("todoCount");
+    const clearCompleted = document.getElementById("clearCompleted");
+
     // Filter buttons
-    const filterAll = document.getElementById('filterAll');
-    const filterActive = document.getElementById('filterActive');
-    const filterCompleted = document.getElementById('filterCompleted');
-    
+    const filterAll = document.getElementById("filterAll");
+    const filterActive = document.getElementById("filterActive");
+    const filterCompleted = document.getElementById("filterCompleted");
+
     // Event listeners
-    addTodoBtn.addEventListener('click', function() {
+    addTodoBtn.addEventListener("click", function () {
         const taskText = todoInput.value.trim();
         if (taskText) {
-            console.log('Add task:', taskText);
+            console.log("Add task:", taskText);
             addTodo(taskText);
-            todoInput.value = '';
+            todoInput.value = "";
         }
     });
-    
-    todoInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
+
+    todoInput.addEventListener("keypress", function (e) {
+        if (e.key === "Enter") {
             addTodoBtn.click();
         }
     });
@@ -39,33 +39,41 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFilter = 'all';
 
     // Filter button event listeners
-    filterAll.addEventListener('click', function() {
+    filterAll.addEventListener("click", function () {
         setActiveFilter(this);
         currentFilter = 'all';
         renderTodos();
     });
-    
-    filterActive.addEventListener('click', function() {
+
+    filterActive.addEventListener("click", function () {
         setActiveFilter(this);
         currentFilter = 'active';
         renderTodos();
     });
-    
-    filterCompleted.addEventListener('click', function() {
+
+    filterCompleted.addEventListener("click", function () {
         setActiveFilter(this);
         currentFilter = 'completed';
         renderTodos();
     });
-    
+
     function setActiveFilter(activeBtn) {
-        [filterAll, filterActive, filterCompleted].forEach(btn => {
-            btn.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
-            btn.classList.add('text-gray-600', 'hover:text-gray-900');
+        [filterAll, filterActive, filterCompleted].forEach((btn) => {
+            btn.classList.remove(
+                "text-blue-600",
+                "border-b-2",
+                "border-blue-600"
+            );
+            btn.classList.add("text-gray-600", "hover:text-gray-900");
         });
-        activeBtn.classList.remove('text-gray-600', 'hover:text-gray-900');
-        activeBtn.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+        activeBtn.classList.remove("text-gray-600", "hover:text-gray-900");
+        activeBtn.classList.add(
+            "text-blue-600",
+            "border-b-2",
+            "border-blue-600"
+        );
     }
-    
+
     // Functions to be implemented
     // - loadTodos() - Load todos from localStorage
     // - addTodo(text) - Add new todo to localStorage
@@ -77,10 +85,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // === LocalStorage helper ===
     function loadTodos() {
-        return JSON.parse(localStorage.getItem('todos')) || [];
+        return JSON.parse(localStorage.getItem("todos")) || [];
     }
     function saveTodos(todos) {
-        localStorage.setItem('todos', JSON.stringify(todos));
+        localStorage.setItem("todos", JSON.stringify(todos));
     }
 
     // === Add todo ===
@@ -113,7 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // === Delete todo ===
     function deleteTodo(id) {
         let todos = loadTodos();
-        todos = todos.filter(t => t.id !== id);
+        todos = todos.filter((t) => t.id !== id);
         saveTodos(todos);
         renderTodos();
         updateTodoCount();
@@ -146,7 +154,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (allTodos.length === 0) {
             emptyState.classList.remove('hidden');
         } else {
-            emptyState.classList.add('hidden');
+            emptyState.classList.add("hidden");
         }
 
         todosToRender.forEach(todo => {
@@ -180,11 +188,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function updateTodoCount() {
         const todos = loadTodos();
-        const remaining = todos.filter(todo => !todo.completed).length;
-        todoCount.textContent = `${remaining} task${remaining !== 1 ? 's' : ''} remaining`;
+        const remaining = todos.filter((todo) => !todo.completed).length;
+        todoCount.textContent = `${remaining} task${
+            remaining !== 1 ? "s" : ""
+        } remaining`;
     }
     // Initial render
     setActiveFilter(filterAll); 
     renderTodos();
+
+    //Expose function globally
+    window.renderTodos = renderTodos;
+    window.updateTodoCount = updateTodoCount;
     updateTodoCount();
 });
